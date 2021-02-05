@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     LatLng[] puntosLatLng;
     PolylineOptions optionsPoly;
     GoogleMap mapa;
+    String[] lugares;
     int con;
 
     @Override
@@ -61,17 +63,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void marcarPunto(LatLng punto){
-        this.optionsPoly.add(punto);
         this.mapa.addMarker(new MarkerOptions().position(punto).title("Punto " + this.con++));
+        this.optionsPoly.add(punto);
     }
 
     public void btnLocalizarCamara(View view){
 
-        String[] item = {"Quinsaloma", "Quevedo", "Ecuador"};
+        this.lugares = new String[]{"Quinsaloma", "Quevedo", "Ecuador"};
 
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Ciudades")
-                .setItems(item, (dialog, which) -> {
+                .setItems(lugares, (dialog, which) -> {
                     cambiarLugar(which);
                 }).show();
     }
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int zoom = 14;
         if(lugar == 2)
             zoom = 6;
+        Eliminar(null);
         CameraPosition posiCamara = new CameraPosition.Builder()
                 .target(this.puntosLatLng[lugar])
                 .zoom(zoom)
@@ -86,16 +89,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         CameraUpdate camara = CameraUpdateFactory.newCameraPosition(posiCamara);
         mapa.animateCamera(camara);
+        this.mapa.addMarker(new MarkerOptions().position(this.puntosLatLng[lugar]).title(lugares[lugar]));
+
     }
 
     public void btndibujarPunto(View view){
-        this.optionsPoly.add( this.puntosLatLng[0]);
-        this.optionsPoly.width(6);
+        this.optionsPoly.add(this.puntosLatLng[0]);
         this.optionsPoly.color(Color.rgb(150, 150, 150));
         this.mapa.addPolyline(this.optionsPoly);
     }
 
     public void Eliminar(View view){
+        this.con = 0;
         this.mapa.clear();
         this.optionsPoly = new PolylineOptions();
     }
